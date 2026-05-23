@@ -1,0 +1,114 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: freelancehub-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-FreelanceHub@2026!}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-freelancehub_db}
+      MYSQL_USER: ${MYSQL_USER:-freelancehub_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-FreelanceHub@User2026!}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - freelancehub-network
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$${MYSQL_ROOT_PASSWORD:-FreelanceHub@2026!}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: freelancehub-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - freelancehub-network
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-FreelanceHub@Redis2026!}
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # FreelanceHub API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: freelancehub-api
+    restart: always
+    ports:
+      - "5000:80"
+      - "5001:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Production}
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Server=mysql;Port=3306;Database=${MYSQL_DATABASE:-freelancehub_db};User=${MYSQL_USER:-freelancehub_user};Password=${MYSQL_PASSWORD:-FreelanceHub@User2026!};
+      - ConnectionStrings__RedisConnection=redis:6379,password=${REDIS_PASSWORD:-FreelanceHub@Redis2026!}
+      - JwtSettings__SecretKey=${JWT_SECRET_KEY:-YourSuperSecretKeyThatIsAtLeast32CharactersLongForProduction!}
+      - JwtSettings__Issuer=FreelanceHub
+      - JwtSettings__Audience=FreelanceHubUsers
+      - JwtSettings__AccessTokenExpirationMinutes=15
+      - JwtSettings__RefreshTokenExpirationDays=7
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - freelancehub-network
+    volumes:
+      - ./logs:/app/logs
+
+  # PHPMyAdmin (Database Management UI)
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: freelancehub-phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD:-FreelanceHub@2026!}
+    ports:
+      - "8080:80"
+    networks:
+      - freelancehub-network
+    depends_on:
+      - mysql
+
+  # Redis Commander (Redis Management UI)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: freelancehub-redis-commander
+    restart: always
+    environment:
+      - REDIS_HOSTS=local:redis:6379:0:${REDIS_PASSWORD:-FreelanceHub@Redis2026!}
+    ports:
+      - "8081:8081"
+    networks:
+      - freelancehub-network
+    depends_on:
+      - redis
+
+networks:
+  freelancehub-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
