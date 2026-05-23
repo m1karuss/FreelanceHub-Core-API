@@ -1,0 +1,30 @@
+{
+  "Serilog": {
+    "MinimumLevel": {
+      "Default": "Debug",
+      "Override": {
+        "Microsoft": "Information",
+        "Microsoft.EntityFrameworkCore": "Information"
+      }
+    }
+  },
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost;Port=3306;Database=freelancehub_dev;User=your_user;Password=your_password;",
+    "RedisConnection": "localhost:6379"
+  },
+  "JwtSettings": {
+    "Secret": "your-super-secret-jwt-key-min-32-characters-long",
+    "Issuer": "FreelanceHub",
+    "Audience": "FreelanceHubUsers",
+    "AccessTokenExpirationMinutes": 15,
+    "RefreshTokenExpirationDays": 7
+  },
+  "EmailSettings": {
+    "SmtpServer": "smtp.gmail.com",
+    "SmtpPort": 587,
+    "SenderEmail": "your-email@example.com",
+    "SenderName": "FreelanceHub",
+    "Username": "your-email@example.com",
+    "Password": "your-app-password"
+  }
+}
