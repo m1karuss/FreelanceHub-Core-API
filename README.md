@@ -87,15 +87,92 @@ FreelanceHub-Core-API/
     └── FreelanceHub.IntegrationTests/
 ```
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    subgraph "Presentation Layer"
+        API[API Controllers]
+        MW[Middleware]
+        Filters[Filters]
+    end
+    
+    subgraph "Application Layer"
+        Services[Business Services]
+        DTOs[DTOs]
+        Validators[Validators]
+        Mappers[AutoMapper Profiles]
+    end
+    
+    subgraph "Domain Layer"
+        Entities[Domain Entities]
+        Interfaces[Repository Interfaces]
+        Enums[Enumerations]
+        Exceptions[Domain Exceptions]
+    end
+    
+    subgraph "Infrastructure Layer"
+        Repos[Repositories]
+        DbContext[EF Core DbContext]
+        Configs[Entity Configurations]
+        ExtServices[External Services]
+    end
+    
+    subgraph "External Dependencies"
+        MySQL[(MySQL Database)]
+        Redis[(Redis Cache)]
+        SMTP[Email Service]
+    end
+    
+    API --> Services
+    MW --> API
+    Filters --> API
+    Services --> DTOs
+    Services --> Validators
+    Services --> Mappers
+    Services --> Interfaces
+    Repos --> Interfaces
+    Repos --> DbContext
+    Repos --> Entities
+    DbContext --> Configs
+    DbContext --> MySQL
+    ExtServices --> Redis
+    ExtServices --> SMTP
+    
+    style API fill:#512BD4
+    style Services fill:#0078D4
+    style Entities fill:#107C10
+    style Repos fill:#FF6F00
+```
+
 ### Dependency Flow
 
-```
-API Layer → Application Layer → Domain Layer
-     ↓
-Infrastructure Layer → Domain Layer
-```
-
 **Key Principle:** Dependencies point inward. Domain has no dependencies. Infrastructure depends on Domain.
+
+```
+┌─────────────────────────────────────────────┐
+│         Presentation Layer (API)            │
+│  Controllers, Middleware, Filters           │
+└──────────────────┬──────────────────────────┘
+                   │
+                   ▼
+┌─────────────────────────────────────────────┐
+│        Application Layer                    │
+│  Services, DTOs, Validators, Mappers        │
+└──────────────────┬──────────────────────────┘
+                   │
+                   ▼
+┌─────────────────────────────────────────────┐
+│          Domain Layer (Core)                │
+│  Entities, Interfaces, Business Rules       │
+└─────────────────────────────────────────────┘
+                   ▲
+                   │
+┌──────────────────┴──────────────────────────┐
+│       Infrastructure Layer                  │
+│  Repositories, DbContext, External Services │
+└─────────────────────────────────────────────┘
+```
 
 ---
 
@@ -450,6 +527,16 @@ Access interactive API documentation at:
 ```
 https://localhost:5001/swagger
 ```
+
+### Comprehensive Documentation
+
+- **[API Documentation](API_DOCUMENTATION.md)** - Complete API reference with examples
+- **[Architecture Guide](ARCHITECTURE.md)** - System design and patterns
+- **[Quick Start Guide](QUICKSTART.md)** - Get started in 5 minutes
+- **[Contributing Guidelines](CONTRIBUTING.md)** - How to contribute
+- **[Changelog](CHANGELOG.md)** - Version history
+- **[Security Policy](SECURITY.md)** - Security guidelines
+- **[Code of Conduct](CODE_OF_CONDUCT.md)** - Community standards
 
 ### Postman Collection
 
