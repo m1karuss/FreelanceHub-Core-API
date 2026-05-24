@@ -634,13 +634,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👨‍💻 Author
 
-**Your Name**  
-Senior .NET Backend Engineer | Enterprise Solutions Architect
-
-- Portfolio: [yourportfolio.com](https://yourportfolio.com)
-- LinkedIn: [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)
-- Email: your.email@example.com
-
+- Email: i2497247@gmail.com
 ---
 
 ## 🎯 Why This Project?
